@@ -222,7 +222,7 @@ void MoveTSB(PCB *TSB){
 	while(TSB!=NULL){
 		TSB->x+=TSB->speed;
 		if(TSB->x>width){
-			//TODO DESTROY BUILET
+			//TODO DESTROY BUILETS
 		}
 		TSB=TSB->next;
 	}
