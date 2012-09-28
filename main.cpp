@@ -17,7 +17,7 @@ bool keys[5] = {false,false,false,false,false};
 void InitTS(PC &TS);
 void DrawTS(PC &TS);
 void MoveTS(PC &TS);
-void Fire(PCB *TSB, PC &TS);
+PCB* Fire(PCB *TSB, PC &TS);
 void InitTSB(PCB *TSB,PC &TS);
 void DrawTSB(PCB *TSB);
 void MoveTSB(PCB *TSB);
@@ -126,7 +126,7 @@ int main (void){
 		else if(ev.type==ALLEGRO_EVENT_TIMER){
 			MoveTS(TS);
 			MoveNM(NM);
-			Fire(TSB,TS);
+			TSB=Fire(TSB,TS);
 			MoveTSB(TSB);
 			redraw=true;
 		}
@@ -189,19 +189,23 @@ void InitTSB(PCB *TSB, PC &TS){
 	TSB->next=NULL;
 }
 
-void Fire(PCB *TSB, PC &TS){
+PCB* Fire(PCB *TSB, PC &TS){
 	if (keys[FIRE]){
 		//printf("FIRE\n");
 		if (TSB==NULL){
 			TSB=(PCB*)malloc(sizeof(PCB));
 			InitTSB(TSB, TS);
+			return TSB;
 		}
 		else{
+			PCB *TMP;
+			TMP=TSB;
 			while(TSB->next!=NULL){
 			TSB=TSB->next;
 			}
 			TSB->next=(PCB*)malloc(sizeof(PCB));
 			InitTSB(TSB->next, TS);
+			return TMP;
 		}
 		
 	}
