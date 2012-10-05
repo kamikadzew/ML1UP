@@ -209,6 +209,7 @@ PCB* Fire(PCB *TSB, PC &TS){
 		}
 		
 	}
+	return TSB;
 }
 
 void DrawTSB(PCB *TSB){
@@ -222,7 +223,7 @@ void MoveTSB(PCB *TSB){
 	while(TSB!=NULL){
 		TSB->x+=TSB->speed;
 		if(TSB->x>width){
-			//TODO DESTROY BUILETS
+			//TODO: DESTROY BUILETS
 		}
 		TSB=TSB->next;
 	}
