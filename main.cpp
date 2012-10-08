@@ -220,12 +220,27 @@ void DrawTSB(PCB *TSB){
 }
 
 void MoveTSB(PCB *TSB){
+	PCB *last;
+	last=NULL;
 	while(TSB!=NULL){
 		TSB->x+=TSB->speed;
 		if(TSB->x>width){
 			//TODO: DESTROY BUILETS
+			if (last!=NULL){
+				last->next=TSB->next;
+				free (TSB);
+				TSB=last;
+			}
+			else{
+				last=TSB->next;
+				free (TSB);
+				TSB=last;
+			}
 		}
-		TSB=TSB->next;
+		last=TSB;
+		if (TSB!=NULL){
+			TSB=TSB->next;
+		}
 	}
 }
 
