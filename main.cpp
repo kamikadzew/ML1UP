@@ -26,7 +26,8 @@ void DrawNM(NPC &NM);
 void MoveNM(NPC &NM);
 void InitNMB(NPCB *NMB,NPC &NM);
 void DrawNMB(NPCB *NMB);
-NPCB* MoveNMB(NPCB *NMB, NPC &NM);
+NPCB* MoveNMB(NPCB *NMB);
+NPCB* FireN(NPCB *NMB, NPC &NM);
 
 int main (void){
 	srand(time(NULL));
@@ -128,7 +129,8 @@ int main (void){
 			MoveNM(NM);
 			TSB=Fire(TSB,TS);
 			TSB=MoveTSB(TSB);
-			NMB=MoveNMB(NMB,NM);
+			NMB=FireN(NMB,NM);
+			NMB=MoveNMB(NMB);
 			redraw=true;
 		}
 		//DRAWING
@@ -193,7 +195,6 @@ void InitTSB(PCB *TSB, PC &TS){
 
 PCB* Fire(PCB *TSB, PC &TS){
 	if (keys[FIRE]){
-		//printf("FIRE\n");
 		if (TSB==NULL){
 			TSB=(PCB*)malloc(sizeof(PCB));
 			InitTSB(TSB, TS);
@@ -287,29 +288,11 @@ void DrawNMB(NPCB *NMB){
 	}
 }
 
-NPCB* MoveNMB(NPCB *NMB, NPC &NM){
+NPCB* MoveNMB(NPCB *NMB){
 	NPCB *last;
 	NPCB *TMP;
 	TMP=NMB;
 	last=NULL;
-
-	if(rand()%20==1){
-		if (NMB==NULL){
-			NMB=(NPCB*)malloc(sizeof(NPCB));
-			InitNMB(NMB, NM);
-		}
-		else{
-			NPCB *TMPF;
-			TMPF=NMB;
-			while(TMPF->next!=NULL){
-			TMPF=TMPF->next;
-			}
-			TMPF->next=(NPCB*)malloc(sizeof(NPCB));
-			InitNMB(TMPF->next, NM);
-		}
-		
-	}
-
 	while(NMB!=NULL){
 		NMB->x-=NMB->speed;
 		if(NMB->x<0){
@@ -326,5 +309,24 @@ NPCB* MoveNMB(NPCB *NMB, NPC &NM){
 	return TMP;
 }
 
-
+NPCB* FireN(NPCB *NMB, NPC &NM){
+	if(rand()%20==1){
+		if (NMB==NULL){
+			NMB=(NPCB*)malloc(sizeof(NPCB));
+			InitNMB(NMB, NM);
+			return NMB;
+		}
+		else{
+			NPCB *TMP;
+			TMP=NMB;
+			while(NMB->next!=NULL){
+			NMB=NMB->next;
+			}
+			NMB->next=(NPCB*)malloc(sizeof(NPCB));
+			InitNMB(NMB->next, NM);
+			return TMP;
+		}
+	}
+	return NMB;
+}
 
