@@ -20,13 +20,13 @@ void MoveTS(PC &TS);
 PCB* Fire(PCB *TSB, PC &TS);
 void InitTSB(PCB *TSB,PC &TS);
 void DrawTSB(PCB *TSB);
-void MoveTSB(PCB *TSB);
+PCB* MoveTSB(PCB *TSB);
 void InitNM(NPC &NM);
 void DrawNM(NPC &NM);
 void MoveNM(NPC &NM);
 void InitNMB(NPCB *NMB,NPC &NM);
 void DrawNMB(NPCB *NMB);
-void MoveNMB(NPCB *NMB);
+NPCB* MoveNMB(NPCB *NMB, NPC &NM);
 
 int main (void){
 	srand(time(NULL));
@@ -47,7 +47,7 @@ int main (void){
 	struct PC TS;
 	struct PCB *TSB=NULL;
 	struct NPC NM;
-	//NPCB NMB;
+	struct NPCB *NMB=NULL;
 	
 	//ALLEGRO INIT*********************************
 	display = al_create_display(width,height);
@@ -127,7 +127,8 @@ int main (void){
 			MoveTS(TS);
 			MoveNM(NM);
 			TSB=Fire(TSB,TS);
-			MoveTSB(TSB);
+			TSB=MoveTSB(TSB);
+			NMB=MoveNMB(NMB,NM);
 			redraw=true;
 		}
 		//DRAWING
@@ -137,6 +138,7 @@ int main (void){
 			DrawTS(TS);
 			DrawNM(NM);
 			DrawTSB(TSB);
+			DrawNMB(NMB);
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
 		}
@@ -219,29 +221,25 @@ void DrawTSB(PCB *TSB){
 	}
 }
 
-void MoveTSB(PCB *TSB){
+PCB* MoveTSB(PCB *TSB){
 	PCB *last;
+	PCB *TMP;
+	TMP=TSB;
 	last=NULL;
 	while(TSB!=NULL){
 		TSB->x+=TSB->speed;
 		if(TSB->x>width){
-			//TODO: DESTROY BUILETS
-			if (last!=NULL){
-				last->next=TSB->next;
-				free (TSB);
-				TSB=last;
-			}
-			else{
-				last=TSB->next;
-				free (TSB);
-				TSB=last;
-			}
+				TMP=TSB;
+				TSB=TSB->next;
+				free(TMP);
+				TMP=TSB;
 		}
 		last=TSB;
 		if (TSB!=NULL){
 			TSB=TSB->next;
 		}
 	}
+	return TMP;
 }
 
 //NIGHTMARE MOON
@@ -272,19 +270,61 @@ void MoveNM(NPC &NM){
 	NM.y+=!(NM.up)*NM.speed;
 }
 
-void InitNMB(NPCB &NMB,NPC NM){
-	NMB.bound=2;
-	NMB.ID=BULLETN;
-	NMB.speed=10;
-	NMB.x=NM.x;
-	NMB.y=NM.y;
-	NMB.deg=1;
-	NMB.next=NULL;
+void InitNMB(NPCB *NMB,NPC &NM){
+	NMB->bound=2;
+	NMB->ID=BULLETN;
+	NMB->speed=10;
+	NMB->x=NM.x;
+	NMB->y=NM.y;
+	NMB->deg=1;
+	NMB->next=NULL;
 }
 
-void DrawNMB(NPCB &NMB);
+void DrawNMB(NPCB *NMB){
+	while(NMB!=NULL){
+		al_draw_filled_circle(NMB->x,NMB->y,10,al_map_rgb(0,0,255));
+		NMB=NMB->next;
+	}
+}
 
-void MoveNMB(NPCB &NMB);
+NPCB* MoveNMB(NPCB *NMB, NPC &NM){
+	NPCB *last;
+	NPCB *TMP;
+	TMP=NMB;
+	last=NULL;
+
+	if(rand()%20==1){
+		if (NMB==NULL){
+			NMB=(NPCB*)malloc(sizeof(NPCB));
+			InitNMB(NMB, NM);
+		}
+		else{
+			NPCB *TMPF;
+			TMPF=NMB;
+			while(TMPF->next!=NULL){
+			TMPF=TMPF->next;
+			}
+			TMPF->next=(NPCB*)malloc(sizeof(NPCB));
+			InitNMB(TMPF->next, NM);
+		}
+		
+	}
+
+	while(NMB!=NULL){
+		NMB->x-=NMB->speed;
+		if(NMB->x<0){
+				TMP=NMB;
+				NMB=NMB->next;
+				free(TMP);
+				TMP=NMB;
+		}
+		last=NMB;
+		if (NMB!=NULL){
+			NMB=NMB->next;
+		}
+	}
+	return TMP;
+}
 
 
 
