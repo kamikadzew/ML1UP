@@ -28,6 +28,8 @@ void InitNMB(NPCB *NMB,NPC &NM);
 void DrawNMB(NPCB *NMB);
 NPCB* MoveNMB(NPCB *NMB);
 NPCB* FireN(NPCB *NMB, NPC &NM);
+NPCB* ColideTS(PC &TS, NPCB *NMB);
+
 
 int main (void){
 	srand(time(NULL));
@@ -131,6 +133,7 @@ int main (void){
 			TSB=MoveTSB(TSB);
 			NMB=FireN(NMB,NM);
 			NMB=MoveNMB(NMB);
+			NMB=ColideTS(TS,NMB);
 			redraw=true;
 		}
 		//DRAWING
@@ -155,18 +158,18 @@ int main (void){
 
 //TWILIGHT SPARKLE
 void InitTS(PC &TS){
-	TS.x=10;
+	TS.x=35;
 	TS.y=height/2;
 	TS.ID=PLAYER;
 	TS.lives=3;
 	TS.speed=7;
-	TS.boundx=6;
-	TS.boundx=7;
+	TS.boundx=60/2;
+	TS.boundx=20/2;
 	TS.score=0;
 }
 
 void DrawTS(PC &TS){
-	al_draw_filled_rectangle(TS.x, TS.y, TS.x+60, TS.y+20, al_map_rgb(205, 50, 255));
+	al_draw_filled_rectangle(TS.x-30, TS.y-10, TS.x+30, TS.y+10, al_map_rgb(205, 50, 255));
 }
 
 void MoveTS(PC &TS){
@@ -272,7 +275,7 @@ void MoveNM(NPC &NM){
 }
 
 void InitNMB(NPCB *NMB,NPC &NM){
-	NMB->bound=2;
+	NMB->bound=8/2;
 	NMB->ID=BULLETN;
 	NMB->speed=10;
 	NMB->x=NM.x;
@@ -330,3 +333,21 @@ NPCB* FireN(NPCB *NMB, NPC &NM){
 	return NMB;
 }
 
+//COLLISIONS
+NPCB* ColideTS(PC &TS, NPCB *NMB){
+	NPCB *TMP=NMB;
+	while(NMB!=NULL){
+		if((( NMB->y-NMB->bound)<(TS.y+TS.boundy)) && 
+			((NMB->y+NMB->bound)>(TS.y-TS.boundy)) &&
+			((NMB->x-NMB->bound)>(TS.x+TS.boundx)) && 
+			((NMB->x+NMB->bound)<(TS.x-TS.boundx))){
+				printf("Dupa");
+		}
+
+
+		if (NMB!=NULL){
+			NMB=NMB->next;
+		}
+	}
+	return TMP;
+}
