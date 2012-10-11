@@ -160,12 +160,12 @@ int main (void){
 //TWILIGHT SPARKLE
 void InitTS(PC &TS){
 	TS.x=35;
-	TS.y=height/2;
+	TS.y=(height/2);
 	TS.ID=PLAYER;
 	TS.lives=3;
 	TS.speed=7;
-	TS.boundx=60/2;
-	TS.boundx=20/2;
+	TS.boundx=(60/2);
+	TS.boundy=(20/2);
 	TS.score=0;
 }
 
@@ -276,7 +276,7 @@ void MoveNM(NPC &NM){
 }
 
 void InitNMB(NPCB *NMB,NPC &NM){
-	NMB->bound=8/2;
+	NMB->bound=(12/2);
 	NMB->ID=BULLETN;
 	NMB->speed=10;
 	NMB->x=NM.x;
@@ -336,7 +336,8 @@ NPCB* FireN(NPCB *NMB, NPC &NM){
 
 //COLLISIONS
 NPCB* ColideTS(PC &TS, NPCB *NMB){
-	NPCB *TMP=NMB;
+	NPCB *RET=NMB;
+	NPCB *last=NULL;
 
 	while(NMB!=NULL){
 
@@ -347,13 +348,29 @@ NPCB* ColideTS(PC &TS, NPCB *NMB){
 			((NMB->y+NMB->bound)>(TS.y-TS.boundy)) &&
 			((NMB->x-NMB->bound)>(TS.x-TS.boundx)) && 
 			((NMB->x+NMB->bound)<(TS.x+TS.boundx))){
-				printf("dupa\n");
+				//printf("dupa\n");
+				NPCB *TMP;
+				if(last==NULL){
+					TMP=NMB;
+					NMB=NMB->next;
+					free(TMP);
+					TMP=NULL;
+					RET=NMB;
+				}
+				else{
+					TMP=NMB;
+					last->next=NMB->next;
+					NMB=last;
+					free(TMP);
+					TMP=NULL;
+				}
+				TS.lives-=1;
+				printf("Lives: %i\n",TS.lives);
 		}
-
-
 		if (NMB!=NULL){
+			last=NMB;
 			NMB=NMB->next;
 		}
 	}
-	return TMP;
+	return RET;
 }
