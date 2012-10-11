@@ -177,14 +177,14 @@ void MoveTS(PC &TS){
 	TS.y+=keys[DOWN]*TS.speed;
 	TS.x-=keys[LEFT]*TS.speed;
 	TS.x+=keys[RIGHT]*TS.speed;
-	if(TS.y<0)
-		TS.y=0;
-	if(TS.y>height-20)
-		TS.y=height-20;
-	if(TS.x<0)
-		TS.x=0;
-	if(TS.x>width/2-60)
-		TS.x=width/2-60;
+	if(TS.y<10)
+		TS.y=10;
+	if(TS.y>height-10)
+		TS.y=height-10;
+	if(TS.x<30)
+		TS.x=30;
+	if(TS.x>width/2-30)
+		TS.x=width/2-30;
 }
 
 void InitTSB(PCB *TSB, PC &TS){
@@ -339,8 +339,8 @@ NPCB* ColideTS(PC &TS, NPCB *NMB){
 	while(NMB!=NULL){
 		if((( NMB->y-NMB->bound)<(TS.y+TS.boundy)) && 
 			((NMB->y+NMB->bound)>(TS.y-TS.boundy)) &&
-			((NMB->x-NMB->bound)>(TS.x+TS.boundx)) && 
-			((NMB->x+NMB->bound)<(TS.x-TS.boundx))){
+			((NMB->x-NMB->bound)<(TS.x+TS.boundx)) && 
+			((NMB->x+NMB->bound)>(TS.x-TS.boundx))){
 				printf("Dupa");
 		}
 
