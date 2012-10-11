@@ -144,6 +144,7 @@ int main (void){
 			DrawNM(NM);
 			DrawTSB(TSB);
 			DrawNMB(NMB);
+                        NMB=ColideTS(TS,NMB); // for debugging purposes
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
 		}
@@ -336,12 +337,17 @@ NPCB* FireN(NPCB *NMB, NPC &NM){
 //COLLISIONS
 NPCB* ColideTS(PC &TS, NPCB *NMB){
 	NPCB *TMP=NMB;
+
 	while(NMB!=NULL){
+
+                al_draw_rectangle(NMB->x-NMB->bound, NMB->y-NMB->bound, NMB->x+NMB->bound, NMB->y+NMB->bound, al_map_rgb(255,0,0), 1);
+                al_draw_rectangle(TS.x-TS.boundx, TS.y-TS.boundy, TS.x+TS.boundx, TS.y+TS.boundy, al_map_rgb(0,255,0), 1);
+
 		if((( NMB->y-NMB->bound)<(TS.y+TS.boundy)) && 
 			((NMB->y+NMB->bound)>(TS.y-TS.boundy)) &&
-			((NMB->x-NMB->bound)<(TS.x+TS.boundx)) && 
-			((NMB->x+NMB->bound)>(TS.x-TS.boundx))){
-				printf("Dupa");
+			((NMB->x-NMB->bound)>(TS.x-TS.boundx)) && 
+			((NMB->x+NMB->bound)<(TS.x+TS.boundx))){
+				printf("dupa\n");
 		}
 
 
