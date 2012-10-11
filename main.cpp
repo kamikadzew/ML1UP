@@ -29,6 +29,7 @@ void DrawNMB(NPCB *NMB);
 NPCB* MoveNMB(NPCB *NMB);
 NPCB* FireN(NPCB *NMB, NPC &NM);
 NPCB* ColideTS(PC &TS, NPCB *NMB);
+PCB* ColideNM(NPC &NM, PCB *TSB);
 
 
 int main (void){
@@ -134,6 +135,7 @@ int main (void){
 			NMB=FireN(NMB,NM);
 			NMB=MoveNMB(NMB);
 			NMB=ColideTS(TS,NMB);
+			TSB=ColideNM(NM,TSB);
 			redraw=true;
 		}
 		//DRAWING
@@ -144,7 +146,7 @@ int main (void){
 			DrawNM(NM);
 			DrawTSB(TSB);
 			DrawNMB(NMB);
-                        NMB=ColideTS(TS,NMB); // for debugging purposes
+			NMB=ColideTS(TS,NMB); // for debugging purposes
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
 		}
@@ -254,13 +256,13 @@ void InitNM(NPC &NM){
 	NM.ID=NONPLAYER;
 	NM.lives=10;
 	NM.speed=2;
-	NM.boundx=6;
-	NM.boundx=7;
+	NM.boundx=(50/2);
+	NM.boundy=(40/2);
 	NM.up=true;
 }
 
 void DrawNM(NPC &NM){
-	al_draw_filled_rectangle(NM.x, NM.y, NM.x-50, NM.y+40, al_map_rgb(0, 0, 128));
+	al_draw_filled_rectangle(NM.x+25, NM.y-20, NM.x-25, NM.y+20, al_map_rgb(0, 0, 128));
 }
 
 void MoveNM(NPC &NM){
@@ -341,8 +343,8 @@ NPCB* ColideTS(PC &TS, NPCB *NMB){
 
 	while(NMB!=NULL){
 
-                al_draw_rectangle(NMB->x-NMB->bound, NMB->y-NMB->bound, NMB->x+NMB->bound, NMB->y+NMB->bound, al_map_rgb(255,0,0), 1);
-                al_draw_rectangle(TS.x-TS.boundx, TS.y-TS.boundy, TS.x+TS.boundx, TS.y+TS.boundy, al_map_rgb(0,255,0), 1);
+				al_draw_rectangle(NMB->x-NMB->bound, NMB->y-NMB->bound, NMB->x+NMB->bound, NMB->y+NMB->bound, al_map_rgb(255,0,0), 1);
+				al_draw_rectangle(TS.x-TS.boundx, TS.y-TS.boundy, TS.x+TS.boundx, TS.y+TS.boundy, al_map_rgb(0,255,0), 1);
 
 		if((( NMB->y-NMB->bound)<(TS.y+TS.boundy)) && 
 			((NMB->y+NMB->bound)>(TS.y-TS.boundy)) &&
@@ -370,6 +372,46 @@ NPCB* ColideTS(PC &TS, NPCB *NMB){
 		if (NMB!=NULL){
 			last=NMB;
 			NMB=NMB->next;
+		}
+	}
+	return RET;
+}
+
+PCB* ColideNM(NPC &NM, PCB *TSB){
+	PCB *RET=TSB;
+	PCB *last=NULL;
+
+	while(TSB!=NULL){
+
+				al_draw_rectangle(TSB->x-TSB->bound, TSB->y-TSB->bound, TSB->x+TSB->bound, TSB->y+TSB->bound, al_map_rgb(255,0,0), 1);
+				al_draw_rectangle(NM.x-NM.boundx, NM.y-NM.boundy, NM.x+NM.boundx, NM.y+NM.boundy, al_map_rgb(0,255,0), 1);
+
+		if((( TSB->y-TSB->bound)<(NM.y+NM.boundy)) && 
+			((TSB->y+TSB->bound)>(NM.y-NM.boundy)) &&
+			((TSB->x-TSB->bound)>(NM.x-NM.boundx)) && 
+			((TSB->x+TSB->bound)<(NM.x+NM.boundx))){
+				printf("dupa\n");
+				PCB *TMP;
+				if(last==NULL){
+					TMP=TSB;
+					TSB=TSB->next;
+					free(TMP);
+					TMP=NULL;
+					RET=TSB;
+				}
+				else{
+					TMP=TSB;
+					last->next=TSB->next;
+					TSB=last;
+					free(TMP);
+					TMP=NULL;
+				}
+				NM.lives-=1;
+				printf("NM Lives: %i\n",NM.lives);
+		}
+		if (TSB!=NULL){
+			last=TSB;
+			TSB=TSB->next;
 		}
 	}
 	return RET;
