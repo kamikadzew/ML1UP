@@ -1,10 +1,13 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <stdio.h>
+#include <string>
 #include "objects.h"
 
-
+using namespace std;
 
 //GLOBALS
 const int fps=60;
@@ -30,11 +33,14 @@ NPCB* MoveNMB(NPCB *NMB);
 NPCB* FireN(NPCB *NMB, NPC &NM);
 NPCB* ColideTS(PC &TS, NPCB *NMB);
 PCB* ColideNM(NPC &NM, PCB *TSB);
+void GUI(NPC NM, PC TS);
 
 
 int main (void){
 	srand(time(NULL));
 	//ALLEGRO VIRABLES
+	al_init_font_addon();
+	al_init_ttf_addon();
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 	ALLEGRO_TIMER *timer =NULL;
@@ -53,7 +59,7 @@ int main (void){
 	struct NPC NM;
 	struct NPCB *NMB=NULL;
 	
-	//ALLEGRO INIT*********************************
+	//DISPLAY INIT
 	display = al_create_display(width,height);
 	//DISPLAY CHECK
 	if(!display)
@@ -146,7 +152,7 @@ int main (void){
 			DrawNM(NM);
 			DrawTSB(TSB);
 			DrawNMB(NMB);
-			NMB=ColideTS(TS,NMB); // for debugging purposes
+			GUI(NM,TS);
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
 		}
@@ -201,6 +207,7 @@ void InitTSB(PCB *TSB, PC &TS){
 
 PCB* Fire(PCB *TSB, PC &TS){
 	if (keys[FIRE]){
+		keys[FIRE]=0;
 		if (TSB==NULL){
 			TSB=(PCB*)malloc(sizeof(PCB));
 			InitTSB(TSB, TS);
@@ -254,7 +261,7 @@ void InitNM(NPC &NM){
 	NM.x=width-10;
 	NM.y=height/2-20;
 	NM.ID=NONPLAYER;
-	NM.lives=10;
+	NM.lives=20;
 	NM.speed=2;
 	NM.boundx=(50/2);
 	NM.boundy=(40/2);
@@ -262,7 +269,7 @@ void InitNM(NPC &NM){
 }
 
 void DrawNM(NPC &NM){
-	al_draw_filled_rectangle(NM.x+25, NM.y-20, NM.x-25, NM.y+20, al_map_rgb(0, 0, 128));
+	al_draw_filled_rectangle(NM.x, NM.y-20, NM.x-50, NM.y+20, al_map_rgb(0, 0, 128));
 }
 
 void MoveNM(NPC &NM){
@@ -390,7 +397,7 @@ PCB* ColideNM(NPC &NM, PCB *TSB){
 			((TSB->y+TSB->bound)>(NM.y-NM.boundy)) &&
 			((TSB->x-TSB->bound)>(NM.x-NM.boundx)) && 
 			((TSB->x+TSB->bound)<(NM.x+NM.boundx))){
-				printf("dupa\n");
+				//printf("dupa\n");
 				PCB *TMP;
 				if(last==NULL){
 					TMP=TSB;
@@ -415,4 +422,19 @@ PCB* ColideNM(NPC &NM, PCB *TSB){
 		}
 	}
 	return RET;
+}
+
+//GUI
+void GUI(NPC NM, PC TS){
+	char text[25];
+	//DEBUG:Font error
+	/*
+	ALLEGRO_FONT *font24=al_load_font("comic.ttf",24,0);
+	sprintf(text,"Twilights lives: %i",TS.lives);
+	al_draw_text(font24,al_map_rgb(205, 50, 255),20,30,0,text);
+	*/
+	
+	
+	
+	al_draw_filled_rectangle(20, 5,((width-20)/20)*NM.lives , 25, al_map_rgb(50, 50, 255));
 }
