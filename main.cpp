@@ -33,26 +33,27 @@ NPCB* MoveNMB(NPCB *NMB);
 NPCB* FireN(NPCB *NMB, NPC &NM);
 NPCB* ColideTS(PC &TS, NPCB *NMB);
 PCB* ColideNM(NPC &NM, PCB *TSB);
-void GUI(NPC NM, PC TS);
+void GUI(NPC NM, PC TS,ALLEGRO_FONT *font24);
 
 
 int main (void){
 	srand(time(NULL));
 	//ALLEGRO VIRABLES
-	al_init_font_addon();
-	al_init_ttf_addon();
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 	ALLEGRO_TIMER *timer =NULL;
+
 	//ALLEGRO CHECK
 	if(!al_init())
 	{
 		al_show_native_message_box(NULL,NULL,NULL,"FAIL TO INIT ALLEGRO",NULL,NULL);
 		return -1;
 	}
+	
 	//VARIABLES
 	bool done = false;
 	bool redraw = false;
+	
 	//OBJECTS
 	struct PC TS;
 	struct PCB *TSB=NULL;
@@ -61,6 +62,7 @@ int main (void){
 	
 	//DISPLAY INIT
 	display = al_create_display(width,height);
+	
 	//DISPLAY CHECK
 	if(!display)
 	{
@@ -68,22 +70,30 @@ int main (void){
 		return -1;
 	}
 	
+	al_init_font_addon();
+	al_init_ttf_addon();
 	al_init_primitives_addon();
 	al_install_keyboard();
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0/fps);
+	
+	ALLEGRO_FONT *font24=al_load_font("comic.ttf",24,0);
+	
 	//INITS
 	InitTS(TS);
 	InitNM(NM);
+	
 	//EVENTS CATCHER
 	al_register_event_source(event_queue,al_get_keyboard_event_source());
 	al_register_event_source(event_queue,al_get_display_event_source(display));
 	al_register_event_source(event_queue,al_get_timer_event_source(timer));
+	
 	//GAME LOOP
 	al_start_timer(timer);
 	while(!done){
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue,&ev);
+		
 		//KEY DOWN
 		if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
 			switch(ev.keyboard.keycode){
@@ -104,6 +114,7 @@ int main (void){
 				break;
 			}
 		}
+		
 		//KEY UP
 		else if(ev.type == ALLEGRO_EVENT_KEY_UP)
 		{
@@ -128,10 +139,12 @@ int main (void){
 				break;
 			}
 		}
-		//THE RED X
+		
+		//THE RED "X"
 		else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
 			done=true;
 		}
+		
 		//TIMER & MOVMENT
 		else if(ev.type==ALLEGRO_EVENT_TIMER){
 			MoveTS(TS);
@@ -152,7 +165,7 @@ int main (void){
 			DrawNM(NM);
 			DrawTSB(TSB);
 			DrawNMB(NMB);
-			GUI(NM,TS);
+			GUI(NM,TS,font24);
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
 		}
@@ -425,16 +438,12 @@ PCB* ColideNM(NPC &NM, PCB *TSB){
 }
 
 //GUI
-void GUI(NPC NM, PC TS){
+void GUI(NPC NM, PC TS, ALLEGRO_FONT *font24){
 	char text[25];
 	//DEBUG:Font error
-	/*
-	ALLEGRO_FONT *font24=al_load_font("comic.ttf",24,0);
+	
 	sprintf(text,"Twilights lives: %i",TS.lives);
 	al_draw_text(font24,al_map_rgb(205, 50, 255),20,30,0,text);
-	*/
-	
-	
 	
 	al_draw_filled_rectangle(20, 5,((width-20)/20)*NM.lives , 25, al_map_rgb(50, 50, 255));
 }
