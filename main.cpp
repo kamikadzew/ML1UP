@@ -35,6 +35,7 @@ NPCB* ColideTS(PC &TS, NPCB *NMB);
 PCB* ColideNM(NPC &NM, PCB *TSB, PC &TS);
 void GUI(NPC NM, PC TS,ALLEGRO_FONT *font24);
 void Win(PC TS, NPC NM, ALLEGRO_FONT *font36);
+void Loser(PC TS, NPC NM, ALLEGRO_FONT *font36);
 
 
 int main (void){
@@ -171,6 +172,9 @@ int main (void){
 			if(NM.lives<=0){
 				Win(TS,NM,font36);
 			}
+			else if(TS.lives<=0){
+				Loser(TS,NM,font36);
+			}
 			else{
 				TS.score=TS.score-1;
 			}
@@ -283,7 +287,7 @@ void InitNM(NPC &NM){
 	NM.x=width-35;
 	NM.y=height/2-20;
 	NM.ID=NONPLAYER;
-	NM.lives=1;
+	NM.lives=40;
 	NM.speed=2;
 	NM.boundx=(50/2);
 	NM.boundy=(40/2);
@@ -461,6 +465,13 @@ void GUI(NPC NM, PC TS, ALLEGRO_FONT *font24){
 void Win(PC TS, NPC NM, ALLEGRO_FONT *font36){
 	char text[50];
 	al_clear_to_color(al_map_rgb(0,0,0));
-	sprintf(text,"You Win! Score: %i",(TS.score+(500*TS.hits)));
+	sprintf(text,"You Win! Score: %i",(TS.score+(500*TS.hits)+(5000*TS.lives)));
+	al_draw_text(font36,al_map_rgb(205, 50, 255),width/2,height/2,ALLEGRO_ALIGN_CENTRE,text);
+}
+
+void Loser(PC TS, NPC NM, ALLEGRO_FONT *font36){
+	char text[50];
+	al_clear_to_color(al_map_rgb(0,0,0));
+	sprintf(text,"You Lost! Score: %i",(500*TS.hits));
 	al_draw_text(font36,al_map_rgb(205, 50, 255),width/2,height/2,ALLEGRO_ALIGN_CENTRE,text);
 }
