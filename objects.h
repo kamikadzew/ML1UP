@@ -11,6 +11,7 @@ struct PC{
 	int boundx;
 	int boundy;
 	int score;
+	int hits;
 };
 
 //Non Player Character

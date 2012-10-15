@@ -32,8 +32,9 @@ void DrawNMB(NPCB *NMB);
 NPCB* MoveNMB(NPCB *NMB);
 NPCB* FireN(NPCB *NMB, NPC &NM);
 NPCB* ColideTS(PC &TS, NPCB *NMB);
-PCB* ColideNM(NPC &NM, PCB *TSB);
+PCB* ColideNM(NPC &NM, PCB *TSB, PC &TS);
 void GUI(NPC NM, PC TS,ALLEGRO_FONT *font24);
+void Win(PC TS, NPC NM, ALLEGRO_FONT *font36);
 
 
 int main (void){
@@ -78,6 +79,7 @@ int main (void){
 	timer = al_create_timer(1.0/fps);
 	
 	ALLEGRO_FONT *font24=al_load_font("COMIC.TTF",24,0);
+	ALLEGRO_FONT *font36=al_load_font("COMIC.TTF",36,0);
 	
 	//INITS
 	InitTS(TS);
@@ -154,7 +156,7 @@ int main (void){
 			NMB=FireN(NMB,NM);
 			NMB=MoveNMB(NMB);
 			NMB=ColideTS(TS,NMB);
-			TSB=ColideNM(NM,TSB);
+			TSB=ColideNM(NM,TSB,TS);
 			redraw=true;
 		}
 		//DRAWING
@@ -166,6 +168,12 @@ int main (void){
 			DrawTSB(TSB);
 			DrawNMB(NMB);
 			GUI(NM,TS,font24);
+			if(NM.lives<=0){
+				Win(TS,NM,font36);
+			}
+			else{
+				TS.score=TS.score-1;
+			}
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
 		}
@@ -187,7 +195,8 @@ void InitTS(PC &TS){
 	TS.speed=7;
 	TS.boundx=(60/2);
 	TS.boundy=(20/2);
-	TS.score=0;
+	TS.score=(fps*60*2);
+	TS.hits=0;
 }
 
 void DrawTS(PC &TS){
@@ -271,10 +280,10 @@ PCB* MoveTSB(PCB *TSB){
 
 //NIGHTMARE MOON
 void InitNM(NPC &NM){
-	NM.x=width-10;
+	NM.x=width-35;
 	NM.y=height/2-20;
 	NM.ID=NONPLAYER;
-	NM.lives=20;
+	NM.lives=1;
 	NM.speed=2;
 	NM.boundx=(50/2);
 	NM.boundy=(40/2);
@@ -282,7 +291,7 @@ void InitNM(NPC &NM){
 }
 
 void DrawNM(NPC &NM){
-	al_draw_filled_rectangle(NM.x, NM.y-20, NM.x-50, NM.y+20, al_map_rgb(0, 0, 128));
+	al_draw_filled_rectangle(NM.x+25, NM.y-20, NM.x-25, NM.y+20, al_map_rgb(0, 0, 128));
 }
 
 void MoveNM(NPC &NM){
@@ -370,7 +379,6 @@ NPCB* ColideTS(PC &TS, NPCB *NMB){
 			((NMB->y+NMB->bound)>(TS.y-TS.boundy)) &&
 			((NMB->x-NMB->bound)>(TS.x-TS.boundx)) && 
 			((NMB->x+NMB->bound)<(TS.x+TS.boundx))){
-				//printf("dupa\n");
 				NPCB *TMP;
 				if(last==NULL){
 					TMP=NMB;
@@ -397,7 +405,7 @@ NPCB* ColideTS(PC &TS, NPCB *NMB){
 	return RET;
 }
 
-PCB* ColideNM(NPC &NM, PCB *TSB){
+PCB* ColideNM(NPC &NM, PCB *TSB,PC &TS){
 	PCB *RET=TSB;
 	PCB *last=NULL;
 
@@ -410,7 +418,7 @@ PCB* ColideNM(NPC &NM, PCB *TSB){
 			((TSB->y+TSB->bound)>(NM.y-NM.boundy)) &&
 			((TSB->x-TSB->bound)>(NM.x-NM.boundx)) && 
 			((TSB->x+TSB->bound)<(NM.x+NM.boundx))){
-				//printf("dupa\n");
+				TS.hits++;
 				PCB *TMP;
 				if(last==NULL){
 					TMP=TSB;
@@ -440,8 +448,19 @@ PCB* ColideNM(NPC &NM, PCB *TSB){
 //GUI
 void GUI(NPC NM, PC TS, ALLEGRO_FONT *font24){
 	char text[25];
+	//TS Lives Draw
 	sprintf(text,"Twilights lives: %i",TS.lives);
 	al_draw_text(font24,al_map_rgb(205, 50, 255),20,30,0,text);
-	
-	al_draw_filled_rectangle(20, 5,((width-20)/20)*NM.lives , 25, al_map_rgb(50, 50, 255));
+	//Score Draw
+	sprintf(text,"Score: %i",(TS.score+(500*TS.hits)));
+	al_draw_text(font24,al_map_rgb(205, 50, 255),width-20,30,ALLEGRO_ALIGN_RIGHT,text);
+	//NM Live
+	al_draw_filled_rectangle(20, 5,((width)/40)*NM.lives , 25, al_map_rgb(50, 50, 255));
+}
+
+void Win(PC TS, NPC NM, ALLEGRO_FONT *font36){
+	char text[50];
+	al_clear_to_color(al_map_rgb(0,0,0));
+	sprintf(text,"You Win! Score: %i",(TS.score+(500*TS.hits)));
+	al_draw_text(font36,al_map_rgb(205, 50, 255),width/2,height/2,ALLEGRO_ALIGN_CENTRE,text);
 }
