@@ -77,7 +77,7 @@ int main (void){
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0/fps);
 	
-	ALLEGRO_FONT *font24=al_load_font("comic.ttf",24,0);
+	ALLEGRO_FONT *font24=al_load_font("COMIC.TTF",24,0);
 	
 	//INITS
 	InitTS(TS);
@@ -440,8 +440,6 @@ PCB* ColideNM(NPC &NM, PCB *TSB){
 //GUI
 void GUI(NPC NM, PC TS, ALLEGRO_FONT *font24){
 	char text[25];
-	//DEBUG:Font error
-	
 	sprintf(text,"Twilights lives: %i",TS.lives);
 	al_draw_text(font24,al_map_rgb(205, 50, 255),20,30,0,text);
 	
