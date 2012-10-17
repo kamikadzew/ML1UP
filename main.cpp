@@ -315,7 +315,7 @@ void DrawNMB(NPCB *NMB){
 	}
 }
 
-NPCB* MoveNMB(NPCB *NMB){
+List* MoveNMB(NPCB *NMB){
 	NPCB *last;
 	NPCB *TMP;
 	TMP=NMB;
@@ -335,7 +335,7 @@ NPCB* MoveNMB(NPCB *NMB){
 	return TMP;
 }
 
-NPCB* FireN(NPCB *NMB, NPC &NM){
+List* FireN(NPCB *NMB, NPC &NM){
 	if(rand()%20==1){
 		if (NMB==NULL){
 			NMB=(NPCB*)malloc(sizeof(NPCB));
