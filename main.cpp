@@ -5,7 +5,7 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <stdio.h>
 #include "objects.h"
-#include "Lists.h"
+#include "lists.h"
 
 using namespace std;
 
@@ -79,8 +79,8 @@ int main (void){
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0/fps);
 	
-	ALLEGRO_FONT *font24=al_load_font("COMIC.TTF",24,0);
-	ALLEGRO_FONT *font36=al_load_font("COMIC.TTF",36,0);
+	ALLEGRO_FONT *font24=al_load_font("comic.ttf",24,0);
+	ALLEGRO_FONT *font36=al_load_font("comic.ttf",36,0);
 	
 	//INITS
 	InitTS(TS);
@@ -315,7 +315,7 @@ void DrawNMB(NPCB *NMB){
 	}
 }
 
-NPCB* MoveNMB(NPCB *NMB){
+List* MoveNMB(NPCB *NMB){
 	NPCB *last;
 	NPCB *TMP;
 	TMP=NMB;
@@ -335,7 +335,7 @@ NPCB* MoveNMB(NPCB *NMB){
 	return TMP;
 }
 
-NPCB* FireN(NPCB *NMB, NPC &NM){
+List* FireN(NPCB *NMB, NPC &NM){
 	if(rand()%20==1){
 		if (NMB==NULL){
 			NMB=(NPCB*)malloc(sizeof(NPCB));

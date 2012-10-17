@@ -1,16 +1,11 @@
-struct List{
-	void *element;
-	struct List *next;
-};
+#include <stdlib.h>
+#include "lists.h"
 
-
-List *ListDel(List *LST,List *last);
-List *ListAdd(List *LST);
-
+using namespace std;
 
 List *ListDel(List *LST,List *last){
-List *TMP;
-if(last==NULL){
+	List *TMP;
+	if(last==NULL){
 		TMP=LST;
 		LST=LST->next;
 		free(TMP);
