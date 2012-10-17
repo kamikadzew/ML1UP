@@ -46,3 +46,4 @@ struct NPCB{
 	int deg;
 	NPCB *next;
 };
+

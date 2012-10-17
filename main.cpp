@@ -4,8 +4,8 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <stdio.h>
-#include <string>
 #include "objects.h"
+#include "Lists.h"
 
 using namespace std;
 
@@ -20,19 +20,19 @@ bool keys[5] = {false,false,false,false,false};
 void InitTS(PC &TS);
 void DrawTS(PC &TS);
 void MoveTS(PC &TS);
-PCB* Fire(PCB *TSB, PC &TS);
-void InitTSB(PCB *TSB,PC &TS);
-void DrawTSB(PCB *TSB);
-PCB* MoveTSB(PCB *TSB);
+List* Fire(List *TSB, PC &TS);
+void InitTSB(List *TSB,PC &TS);
+void DrawTSB(List *TSB);
+List* MoveTSB(List *TSB);
 void InitNM(NPC &NM);
 void DrawNM(NPC &NM);
 void MoveNM(NPC &NM);
-void InitNMB(NPCB *NMB,NPC &NM);
-void DrawNMB(NPCB *NMB);
-NPCB* MoveNMB(NPCB *NMB);
-NPCB* FireN(NPCB *NMB, NPC &NM);
-NPCB* ColideTS(PC &TS, NPCB *NMB);
-PCB* ColideNM(NPC &NM, PCB *TSB, PC &TS);
+void InitNMB(List *NMB,NPC &NM);
+void DrawNMB(List *NMB);
+List* MoveNMB(List *NMB);
+List* FireN(List *NMB, NPC &NM);
+List* ColideTS(PC &TS, List *NMB);
+List* ColideNM(NPC &NM, List *TSB, PC &TS);
 void GUI(NPC NM, PC TS,ALLEGRO_FONT *font24);
 void Win(PC TS, NPC NM, ALLEGRO_FONT *font36);
 void Loser(PC TS, NPC NM, ALLEGRO_FONT *font36);
@@ -58,9 +58,9 @@ int main (void){
 	
 	//OBJECTS
 	struct PC TS;
-	struct PCB *TSB=NULL;
+	struct List *TSB=NULL;
 	struct NPC NM;
-	struct NPCB *NMB=NULL;
+	struct List *NMB=NULL;
 	
 	//DISPLAY INIT
 	display = al_create_display(width,height);
@@ -171,6 +171,7 @@ int main (void){
 			GUI(NM,TS,font24);
 			if(NM.lives<=0){
 				Win(TS,NM,font36);
+				//TODO: Add restarting game with eg. R, by doing init of NM and TS
 			}
 			else if(TS.lives<=0){
 				Loser(TS,NM,font36);
@@ -222,64 +223,51 @@ void MoveTS(PC &TS){
 		TS.x=width/2-30;
 }
 
-void InitTSB(PCB *TSB, PC &TS){
-	TSB->bound=2;
-	TSB->ID=BULLETP;
-	TSB->speed=10;
-	TSB->x=TS.x;
-	TSB->y=TS.y;
-	TSB->next=NULL;
+void InitTSB(List *TSB, PC &TS){
+	
+	TSB->element=(PCB*)malloc(sizeof(PCB));
+	while (TSB->next==NULL)
+			TSB=TSB->next;
+	struct PCB *TMP=(PCB*)TSB->element;
+	TMP->bound=2;
+	TMP->ID=BULLETP;
+	TMP->speed=10;
+	TMP->x=TS.x;
+	TMP->y=TS.y;
+	TMP->next=NULL;
 }
 
-PCB* Fire(PCB *TSB, PC &TS){
+List* Fire(List *TSB, PC &TS){
 	if (keys[FIRE]){
 		keys[FIRE]=0;
-		if (TSB==NULL){
-			TSB=(PCB*)malloc(sizeof(PCB));
-			InitTSB(TSB, TS);
-			return TSB;
-		}
-		else{
-			PCB *TMP;
-			TMP=TSB;
-			while(TSB->next!=NULL){
-			TSB=TSB->next;
-			}
-			TSB->next=(PCB*)malloc(sizeof(PCB));
-			InitTSB(TSB->next, TS);
-			return TMP;
-		}
-		
+		TSB=ListAdd(TSB);
+		InitTSB(TSB,TS);
 	}
 	return TSB;
 }
 
-void DrawTSB(PCB *TSB){
+void DrawTSB(List *TSB){
+	struct PCB *TMP;
 	while(TSB!=NULL){
-		al_draw_filled_circle(TSB->x,TSB->y,10,al_map_rgb(255,255,255));
+		TMP=(PCB*)TSB->element;
+		al_draw_filled_circle(TMP->x,TMP->y,10,al_map_rgb(255,255,255));
 		TSB=TSB->next;
 	}
 }
 
-PCB* MoveTSB(PCB *TSB){
-	PCB *last;
+List* MoveTSB(List *TSB){
 	PCB *TMP;
-	TMP=TSB;
-	last=NULL;
+	List *RET;
 	while(TSB!=NULL){
-		TSB->x+=TSB->speed;
-		if(TSB->x>width){
-				TMP=TSB;
-				TSB=TSB->next;
-				free(TMP);
-				TMP=TSB;
-		}
-		last=TSB;
+		TMP=(PCB*)TSB->element;
+		TMP->x+=TMP->speed;
+		if(TMP->x>width)
+			RET=ListDel(TSB,NULL);
 		if (TSB!=NULL){
 			TSB=TSB->next;
 		}
 	}
-	return TMP;
+	return RET;
 }
 
 //NIGHTMARE MOON
@@ -340,7 +328,6 @@ NPCB* MoveNMB(NPCB *NMB){
 				free(TMP);
 				TMP=NMB;
 		}
-		last=NMB;
 		if (NMB!=NULL){
 			NMB=NMB->next;
 		}
@@ -370,36 +357,24 @@ NPCB* FireN(NPCB *NMB, NPC &NM){
 }
 
 //COLLISIONS
-NPCB* ColideTS(PC &TS, NPCB *NMB){
-	NPCB *RET=NMB;
-	NPCB *last=NULL;
+List* ColideTS(PC &TS, List *NMB){
+	struct List *RET=NMB;
+	struct List *last=NULL;
+	struct NPCB *TMP;
 
 	while(NMB!=NULL){
+		TMP=(NPCB*)NMB->element;
 
-				al_draw_rectangle(NMB->x-NMB->bound, NMB->y-NMB->bound, NMB->x+NMB->bound, NMB->y+NMB->bound, al_map_rgb(255,0,0), 1);
+				al_draw_rectangle(TMP->x-TMP->bound, TMP->y-TMP->bound, TMP->x+TMP->bound, TMP->y+TMP->bound, al_map_rgb(255,0,0), 1);
 				al_draw_rectangle(TS.x-TS.boundx, TS.y-TS.boundy, TS.x+TS.boundx, TS.y+TS.boundy, al_map_rgb(0,255,0), 1);
 
-		if((( NMB->y-NMB->bound)<(TS.y+TS.boundy)) && 
-			((NMB->y+NMB->bound)>(TS.y-TS.boundy)) &&
-			((NMB->x-NMB->bound)>(TS.x-TS.boundx)) && 
-			((NMB->x+NMB->bound)<(TS.x+TS.boundx))){
-				NPCB *TMP;
-				if(last==NULL){
-					TMP=NMB;
-					NMB=NMB->next;
-					free(TMP);
-					TMP=NULL;
-					RET=NMB;
-				}
-				else{
-					TMP=NMB;
-					last->next=NMB->next;
-					NMB=last;
-					free(TMP);
-					TMP=NULL;
-				}
+		if((( TMP->y-TMP->bound)<(TS.y+TS.boundy)) && 
+			((TMP->y+TMP->bound)>(TS.y-TS.boundy)) &&
+			((TMP->x-TMP->bound)>(TS.x-TS.boundx)) && 
+			((TMP->x+TMP->bound)<(TS.x+TS.boundx))){
+				NMB=ListDel(NMB,last);
 				TS.lives-=1;
-				printf("Lives: %i\n",TS.lives);
+				//printf("Lives: %i\n",TS.lives);
 		}
 		if (NMB!=NULL){
 			last=NMB;
@@ -409,37 +384,25 @@ NPCB* ColideTS(PC &TS, NPCB *NMB){
 	return RET;
 }
 
-PCB* ColideNM(NPC &NM, PCB *TSB,PC &TS){
-	PCB *RET=TSB;
-	PCB *last=NULL;
+List* ColideNM(NPC &NM, List *TSB,PC &TS){
+	struct List *RET=TSB;
+	struct List *last=NULL;
+	struct PCB *TMP;
 
 	while(TSB!=NULL){
+		TMP=(PCB*)TSB->element;
 
-				al_draw_rectangle(TSB->x-TSB->bound, TSB->y-TSB->bound, TSB->x+TSB->bound, TSB->y+TSB->bound, al_map_rgb(255,0,0), 1);
+				al_draw_rectangle(TMP->x-TMP->bound, TMP->y-TMP->bound, TMP->x+TMP->bound, TMP->y+TMP->bound, al_map_rgb(255,0,0), 1);
 				al_draw_rectangle(NM.x-NM.boundx, NM.y-NM.boundy, NM.x+NM.boundx, NM.y+NM.boundy, al_map_rgb(0,255,0), 1);
 
-		if((( TSB->y-TSB->bound)<(NM.y+NM.boundy)) && 
-			((TSB->y+TSB->bound)>(NM.y-NM.boundy)) &&
-			((TSB->x-TSB->bound)>(NM.x-NM.boundx)) && 
-			((TSB->x+TSB->bound)<(NM.x+NM.boundx))){
+		if((( TMP->y-TMP->bound)<(NM.y+NM.boundy)) && 
+			((TMP->y+TMP->bound)>(NM.y-NM.boundy)) &&
+			((TMP->x-TMP->bound)>(NM.x-NM.boundx)) && 
+			((TMP->x+TMP->bound)<(NM.x+NM.boundx))){
+				TSB=ListDel(TSB,last);
 				TS.hits++;
-				PCB *TMP;
-				if(last==NULL){
-					TMP=TSB;
-					TSB=TSB->next;
-					free(TMP);
-					TMP=NULL;
-					RET=TSB;
-				}
-				else{
-					TMP=TSB;
-					last->next=TSB->next;
-					TSB=last;
-					free(TMP);
-					TMP=NULL;
-				}
 				NM.lives-=1;
-				printf("NM Lives: %i\n",NM.lives);
+				//printf("NM Lives: %i\n",NM.lives);
 		}
 		if (TSB!=NULL){
 			last=TSB;

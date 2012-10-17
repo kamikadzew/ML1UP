@@ -3,3 +3,5 @@ Debug
 allegro.ini
 allegro.log
 main.cpp.orig
+MLP.vcxproj
+MLP.vcxproj.filters
