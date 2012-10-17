@@ -1,7 +1,5 @@
 # git ignore file
 Debug
-allegro.ini
 allegro.log
-main.cpp.orig
-MLP.vcxproj
-MLP.vcxproj.filters
+*.orig
+MLP.vcxproj.user
