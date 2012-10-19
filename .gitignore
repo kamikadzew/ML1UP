@@ -3,3 +3,5 @@ Debug
 allegro.log
 *.orig
 MLP.vcxproj.user
+
+.DS_Store
