@@ -224,10 +224,9 @@ void MoveTS(PC &TS){
 }
 
 void InitTSB(List *TSB, PC &TS){
-	
-	TSB->element=(PCB*)malloc(sizeof(PCB));
 	while (TSB->next==NULL)
-			TSB=TSB->next;
+		TSB=TSB->next;
+	TSB->element=(PCB*)malloc(sizeof(PCB));
 	struct PCB *TMP=(PCB*)TSB->element;
 	TMP->bound=2;
 	TMP->ID=BULLETP;
@@ -257,7 +256,7 @@ void DrawTSB(List *TSB){
 
 List* MoveTSB(List *TSB){
 	PCB *TMP;
-	List *RET;
+	List *RET=TSB;
 	while(TSB!=NULL){
 		TMP=(PCB*)TSB->element;
 		TMP->x+=TMP->speed;
@@ -298,60 +297,49 @@ void MoveNM(NPC &NM){
 	NM.y+=!(NM.up)*NM.speed;
 }
 
-void InitNMB(NPCB *NMB,NPC &NM){
-	NMB->bound=(12/2);
-	NMB->ID=BULLETN;
-	NMB->speed=10;
-	NMB->x=NM.x;
-	NMB->y=NM.y;
-	NMB->deg=1;
-	NMB->next=NULL;
+void InitNMB(List *NMB,NPC &NM){
+	while (NMB->next==NULL)
+		NMB=NMB->next;
+	NMB->element=(NPCB*)malloc(sizeof(NPCB));
+	struct NPCB *TMP=(NPCB*)NMB->element;
+	TMP->bound=(12/2);
+	TMP->ID=BULLETN;
+	TMP->speed=10;
+	TMP->x=NM.x;
+	TMP->y=NM.y;
+	TMP->deg=1;		//For future development
+	TMP->next=NULL;
 }
 
-void DrawNMB(NPCB *NMB){
+void DrawNMB(List *NMB){
+	struct NPCB *TMP;
 	while(NMB!=NULL){
-		al_draw_filled_circle(NMB->x,NMB->y,10,al_map_rgb(0,0,255));
+		TMP=(NPCB*)NMB->element;
+		al_draw_filled_circle(TMP->x,TMP->y,10,al_map_rgb(0,0,255));
 		NMB=NMB->next;
 	}
 }
 
-List* MoveNMB(NPCB *NMB){
-	NPCB *last;
+List* MoveNMB(List *NMB){
 	NPCB *TMP;
-	TMP=NMB;
-	last=NULL;
+	List *RET=NMB;
 	while(NMB!=NULL){
-		NMB->x-=NMB->speed;
-		if(NMB->x<0){
-				TMP=NMB;
-				NMB=NMB->next;
-				free(TMP);
-				TMP=NMB;
+		TMP=(NPCB*)NMB->element;
+		TMP->x-=TMP->speed;
+		if(TMP->x<0){
+			RET=ListDel(NMB,NULL);
 		}
 		if (NMB!=NULL){
 			NMB=NMB->next;
 		}
 	}
-	return TMP;
+	return RET;
 }
 
-List* FireN(NPCB *NMB, NPC &NM){
+List* FireN(List *NMB, NPC &NM){
 	if(rand()%20==1){
-		if (NMB==NULL){
-			NMB=(NPCB*)malloc(sizeof(NPCB));
-			InitNMB(NMB, NM);
-			return NMB;
-		}
-		else{
-			NPCB *TMP;
-			TMP=NMB;
-			while(NMB->next!=NULL){
-			NMB=NMB->next;
-			}
-			NMB->next=(NPCB*)malloc(sizeof(NPCB));
-			InitNMB(NMB->next, NM);
-			return TMP;
-		}
+		NMB=ListAdd(NMB);
+		InitNMB(NMB,NM);
 	}
 	return NMB;
 }

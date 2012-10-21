@@ -5,3 +5,5 @@ allegro.log
 MLP.vcxproj.user
 
 .DS_Store
+MLP.vcxproj
+MLP.vcxproj.filters
