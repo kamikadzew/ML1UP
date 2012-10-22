@@ -33,7 +33,6 @@ struct PCB{
 	int y;
 	int speed;
 	int bound;
-	struct PCB *next;
 };
 
 //NonPlayer Builets
@@ -44,6 +43,5 @@ struct NPCB{
 	int speed;
 	int bound;
 	int deg;
-	NPCB *next;
 };
 

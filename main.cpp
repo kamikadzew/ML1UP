@@ -233,7 +233,8 @@ void InitTSB(List *TSB, PC &TS){
 	TMP->speed=10;
 	TMP->x=TS.x;
 	TMP->y=TS.y;
-	TMP->next=NULL;
+
+	TSB->next=NULL;
 }
 
 List* Fire(List *TSB, PC &TS){
@@ -308,7 +309,8 @@ void InitNMB(List *NMB,NPC &NM){
 	TMP->x=NM.x;
 	TMP->y=NM.y;
 	TMP->deg=1;		//For future development
-	TMP->next=NULL;
+
+	NMB->next=NULL;
 }
 
 void DrawNMB(List *NMB){
@@ -361,6 +363,8 @@ List* ColideTS(PC &TS, List *NMB){
 			((TMP->x-TMP->bound)>(TS.x-TS.boundx)) && 
 			((TMP->x+TMP->bound)<(TS.x+TS.boundx))){
 				NMB=ListDel(NMB,last);
+				if (last==NULL)
+					RET=NMB;
 				TS.lives-=1;
 				//printf("Lives: %i\n",TS.lives);
 		}
@@ -388,6 +392,8 @@ List* ColideNM(NPC &NM, List *TSB,PC &TS){
 			((TMP->x-TMP->bound)>(NM.x-NM.boundx)) && 
 			((TMP->x+TMP->bound)<(NM.x+NM.boundx))){
 				TSB=ListDel(TSB,last);
+				if (last==NULL)
+					RET=TSB;
 				TS.hits++;
 				NM.lives-=1;
 				//printf("NM Lives: %i\n",NM.lives);

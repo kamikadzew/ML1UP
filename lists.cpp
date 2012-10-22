@@ -26,8 +26,7 @@ List *ListAdd(List *LST){
 		LST=(List*)malloc(sizeof(List));
 	}
 	else{
-		List *TMP;
-		TMP=LST;
+		List *TMP=LST;
 		while(TMP->next!=NULL){
 			TMP=TMP->next;
 		}
