@@ -48,7 +48,7 @@ int main (void){
 	//ALLEGRO CHECK
 	if(!al_init())
 	{
-		al_show_native_message_box(NULL,NULL,NULL,"FAIL TO INIT ALLEGRO",NULL,NULL);
+		al_show_native_message_box(NULL,NULL,NULL,"FAIL TO INIT ALLEGRO",NULL,0);
 		return -1;
 	}
 	
@@ -68,7 +68,7 @@ int main (void){
 	//DISPLAY CHECK
 	if(!display)
 	{
-		al_show_native_message_box(NULL,NULL,NULL,"FAIL TO INIT DISPLAY",NULL,NULL);
+		al_show_native_message_box(NULL,NULL,NULL,"FAIL TO INIT DISPLAY",NULL,0);
 		return -1;
 	}
 	

@@ -31,6 +31,7 @@ List *ListAdd(List *LST){
 			TMP=TMP->next;
 		}
 		TMP->next=(List*)malloc(sizeof(List));
+		TMP->next->next=NULL;
 	}
 	return LST;
 }
