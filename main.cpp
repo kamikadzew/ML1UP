@@ -13,183 +13,8 @@ using namespace std;
 const int fps=60;
 const int width=854;
 const int height=480;
-enum KEYS{UP,DOWN,LEFT,RIGHT,FIRE};
-bool keys[5] = {false,false,false,false,false};
-
-//PROTOTYPES
-void InitTS(PC &TS);
-void DrawTS(PC &TS);
-void MoveTS(PC &TS);
-List* Fire(List *TSB, PC &TS);
-void InitTSB(List *TSB,PC &TS);
-void DrawTSB(List *TSB);
-List* MoveTSB(List *TSB);
-void InitNM(NPC &NM);
-void DrawNM(NPC &NM);
-void MoveNM(NPC &NM);
-void InitNMB(List *NMB,NPC &NM);
-void DrawNMB(List *NMB);
-List* MoveNMB(List *NMB);
-List* FireN(List *NMB, NPC &NM);
-List* ColideTS(PC &TS, List *NMB);
-List* ColideNM(NPC &NM, List *TSB, PC &TS);
-void GUI(NPC NM, PC TS,ALLEGRO_FONT *font24);
-void Win(PC TS, NPC NM, ALLEGRO_FONT *font36);
-void Loser(PC TS, NPC NM, ALLEGRO_FONT *font36);
-
-
-int main (void){
-	srand(time(NULL));
-	//ALLEGRO VIRABLES
-	ALLEGRO_DISPLAY *display = NULL;
-	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-	ALLEGRO_TIMER *timer =NULL;
-
-	//ALLEGRO CHECK
-	if(!al_init())
-	{
-		al_show_native_message_box(NULL,NULL,NULL,"FAIL TO INIT ALLEGRO",NULL,0);
-		return -1;
-	}
-	
-	//VARIABLES
-	bool done = false;
-	bool redraw = false;
-	
-	//OBJECTS
-	struct PC TS;
-	struct List *TSB=NULL;
-	struct NPC NM;
-	struct List *NMB=NULL;
-	
-	//DISPLAY INIT
-	display = al_create_display(width,height);
-	
-	//DISPLAY CHECK
-	if(!display)
-	{
-		al_show_native_message_box(NULL,NULL,NULL,"FAIL TO INIT DISPLAY",NULL,0);
-		return -1;
-	}
-	
-	al_init_font_addon();
-	al_init_ttf_addon();
-	al_init_primitives_addon();
-	al_install_keyboard();
-	event_queue = al_create_event_queue();
-	timer = al_create_timer(1.0/fps);
-	
-	ALLEGRO_FONT *font24=al_load_font("comic.ttf",24,0);
-	ALLEGRO_FONT *font36=al_load_font("comic.ttf",36,0);
-	
-	//INITS
-	InitTS(TS);
-	InitNM(NM);
-	
-	//EVENTS CATCHER
-	al_register_event_source(event_queue,al_get_keyboard_event_source());
-	al_register_event_source(event_queue,al_get_display_event_source(display));
-	al_register_event_source(event_queue,al_get_timer_event_source(timer));
-	
-	//GAME LOOP
-	al_start_timer(timer);
-	while(!done){
-		ALLEGRO_EVENT ev;
-		al_wait_for_event(event_queue,&ev);
-		
-		//KEY DOWN
-		if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
-			switch(ev.keyboard.keycode){
-			case ALLEGRO_KEY_UP:
-				keys[UP]=true;
-				break;
-			case ALLEGRO_KEY_DOWN:
-				keys[DOWN]=true;
-				break;
-			case ALLEGRO_KEY_LEFT:
-				keys[LEFT]=true;
-				break;
-			case ALLEGRO_KEY_RIGHT:
-				keys[RIGHT]=true;
-				break;
-			case ALLEGRO_KEY_SPACE:
-				keys[FIRE]=true;
-				break;
-			}
-		}
-		
-		//KEY UP
-		else if(ev.type == ALLEGRO_EVENT_KEY_UP)
-		{
-			switch(ev.keyboard.keycode){
-			case ALLEGRO_KEY_UP:
-				keys[UP]=false;
-				break;
-			case ALLEGRO_KEY_DOWN:
-				keys[DOWN]=false;
-				break;
-			case ALLEGRO_KEY_LEFT:
-				keys[LEFT]=false;
-				break;
-			case ALLEGRO_KEY_RIGHT:
-				keys[RIGHT]=false;
-				break;
-			case ALLEGRO_KEY_SPACE:
-				keys[FIRE]=false;
-				break;
-			case ALLEGRO_KEY_ESCAPE:
-				done = true;
-				break;
-			}
-		}
-		
-		//THE RED "X"
-		else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
-			done=true;
-		}
-		
-		//TIMER & MOVMENT
-		else if(ev.type==ALLEGRO_EVENT_TIMER){
-			MoveTS(TS);
-			MoveNM(NM);
-			TSB=Fire(TSB,TS);
-			TSB=MoveTSB(TSB);
-			NMB=FireN(NMB,NM);
-			NMB=MoveNMB(NMB);
-			NMB=ColideTS(TS,NMB);
-			TSB=ColideNM(NM,TSB,TS);
-			redraw=true;
-		}
-		//DRAWING
-		if(redraw && al_is_event_queue_empty(event_queue)){
-			redraw=false;
-
-			DrawTS(TS);
-			DrawNM(NM);
-			DrawTSB(TSB);
-			DrawNMB(NMB);
-			GUI(NM,TS,font24);
-			if(NM.lives<=0){
-				Win(TS,NM,font36);
-				//TODO: Add restarting game with eg. R, by doing init of NM and TS
-			}
-			else if(TS.lives<=0){
-				Loser(TS,NM,font36);
-			}
-			else{
-				TS.score=TS.score-1;
-			}
-			al_flip_display();
-			al_clear_to_color(al_map_rgb(0,0,0));
-		}
-	}
-	
-	al_destroy_display(display);
-	return 0;
-}
-
-//********************************************************************************************************************************************************************************************
-//********************************************************************************************************************************************************************************************
+enum KEYS{UP,DOWN,LEFT,RIGHT,FIRE,RESTART};
+bool keys[6] = {false,false,false,false,false,false};
 
 //TWILIGHT SPARKLE
 void InitTS(PC &TS){
@@ -433,3 +258,168 @@ void Loser(PC TS, NPC NM, ALLEGRO_FONT *font36){
 	sprintf(text,"You Lost! Score: %i",(500*TS.hits));
 	al_draw_text(font36,al_map_rgb(205, 50, 255),width/2,height/2,ALLEGRO_ALIGN_CENTRE,text);
 }
+
+
+//********************************************************************************************************************************************************************************************
+//********************************************************************************************************************************************************************************************
+
+
+int main (void){
+	srand(time(NULL));
+	//ALLEGRO VIRABLES
+	ALLEGRO_DISPLAY *display = NULL;
+	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
+	ALLEGRO_TIMER *timer =NULL;
+
+	//ALLEGRO CHECK
+	if(!al_init())
+	{
+		al_show_native_message_box(NULL,NULL,NULL,"FAIL TO INIT ALLEGRO",NULL,0);
+		return -1;
+	}
+	
+	//VARIABLES
+	bool done = false;
+	bool redraw = false;
+	
+	//OBJECTS
+	struct PC TS;
+	struct List *TSB=NULL;
+	struct NPC NM;
+	struct List *NMB=NULL;
+	
+	//DISPLAY INIT
+	display = al_create_display(width,height);
+	
+	//DISPLAY CHECK
+	if(!display)
+	{
+		al_show_native_message_box(NULL,NULL,NULL,"FAIL TO INIT DISPLAY",NULL,0);
+		return -1;
+	}
+	
+	al_init_font_addon();
+	al_init_ttf_addon();
+	al_init_primitives_addon();
+	al_install_keyboard();
+	event_queue = al_create_event_queue();
+	timer = al_create_timer(1.0/fps);
+	
+	ALLEGRO_FONT *font24=al_load_font("comic.ttf",24,0);
+	ALLEGRO_FONT *font36=al_load_font("comic.ttf",36,0);
+	
+	//INITS
+	InitTS(TS);
+	InitNM(NM);
+	
+	//EVENTS CATCHER
+	al_register_event_source(event_queue,al_get_keyboard_event_source());
+	al_register_event_source(event_queue,al_get_display_event_source(display));
+	al_register_event_source(event_queue,al_get_timer_event_source(timer));
+	
+	//GAME LOOP
+	al_start_timer(timer);
+	while(!done){
+			ALLEGRO_EVENT ev;
+			al_wait_for_event(event_queue,&ev);
+
+			//KEY DOWN
+			if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
+			switch(ev.keyboard.keycode){
+			case ALLEGRO_KEY_UP:
+				keys[UP]=true;
+				break;
+			case ALLEGRO_KEY_DOWN:
+				keys[DOWN]=true;
+				break;
+			case ALLEGRO_KEY_LEFT:
+				keys[LEFT]=true;
+				break;
+			case ALLEGRO_KEY_RIGHT:
+				keys[RIGHT]=true;
+				break;
+			case ALLEGRO_KEY_SPACE:
+				keys[FIRE]=true;
+				break;
+			case ALLEGRO_KEY_R:
+				keys[RESTART]=true;
+				break;
+			}
+		}
+
+			//KEY UP
+			else if(ev.type == ALLEGRO_EVENT_KEY_UP)
+		{
+			switch(ev.keyboard.keycode){
+			case ALLEGRO_KEY_UP:
+				keys[UP]=false;
+				break;
+			case ALLEGRO_KEY_DOWN:
+				keys[DOWN]=false;
+				break;
+			case ALLEGRO_KEY_LEFT:
+				keys[LEFT]=false;
+				break;
+			case ALLEGRO_KEY_RIGHT:
+				keys[RIGHT]=false;
+				break;
+			case ALLEGRO_KEY_SPACE:
+				keys[FIRE]=false;
+				break;
+			case ALLEGRO_KEY_ESCAPE:
+				done = true;
+				break;
+			case ALLEGRO_KEY_R:
+				keys[RESTART]=false;
+				break;
+			}
+		}
+
+			//THE RED "X"
+			else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+				done=true;
+			}
+
+			else if(NM.lives<=0){
+				Win(TS,NM,font36);
+				al_flip_display();
+				al_clear_to_color(al_map_rgb(0,0,0));
+			}
+			else if(TS.lives<=0){
+				Loser(TS,NM,font36);
+				al_flip_display();
+				al_clear_to_color(al_map_rgb(0,0,0));
+			}
+
+				//TIMER & MOVMENT
+			else if(ev.type==ALLEGRO_EVENT_TIMER){
+				MoveTS(TS);
+				MoveNM(NM);
+				TSB=Fire(TSB,TS);
+				TSB=MoveTSB(TSB);
+				NMB=FireN(NMB,NM);
+				NMB=MoveNMB(NMB);
+				NMB=ColideTS(TS,NMB);
+				TSB=ColideNM(NM,TSB,TS);
+				redraw=true;
+			}
+			//DRAWING
+			if(redraw && al_is_event_queue_empty(event_queue)){
+				redraw=false;
+
+				DrawTS(TS);
+				DrawNM(NM);
+				DrawTSB(TSB);
+				DrawNMB(NMB);
+				GUI(NM,TS,font24);
+				TS.score=TS.score-1;
+
+				al_flip_display();
+				al_clear_to_color(al_map_rgb(0,0,0));
+			}
+	}
+
+	al_destroy_display(display);
+	return 0;
+}
+
