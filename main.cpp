@@ -261,8 +261,10 @@ List* MoveTSB(List *TSB){
 	while(TSB!=NULL){
 		TMP=(PCB*)TSB->element;
 		TMP->x+=TMP->speed;
-		if(TMP->x>width)
+		if(TMP->x>width){
 			RET=ListDel(TSB,NULL);
+			TSB=RET;
+		}
 		if (TSB!=NULL){
 			TSB=TSB->next;
 		}
@@ -328,6 +330,7 @@ List* MoveNMB(List *NMB){
 		TMP->x-=TMP->speed;
 		if(TMP->x<0){
 			RET=ListDel(NMB,NULL);
+			NMB=RET;
 		}
 		if (NMB!=NULL){
 			NMB=NMB->next;
