@@ -224,7 +224,7 @@ void MoveTS(PC &TS){
 }
 
 void InitTSB(List *TSB, PC &TS){
-	while (TSB->next==NULL)
+	while (TSB->next!=NULL)
 		TSB=TSB->next;
 	TSB->element=(PCB*)malloc(sizeof(PCB));
 	struct PCB *TMP=(PCB*)TSB->element;
@@ -299,7 +299,7 @@ void MoveNM(NPC &NM){
 }
 
 void InitNMB(List *NMB,NPC &NM){
-	while (NMB->next==NULL)
+	while (NMB->next!=NULL)
 		NMB=NMB->next;
 	NMB->element=(NPCB*)malloc(sizeof(NPCB));
 	struct NPCB *TMP=(NPCB*)NMB->element;
@@ -309,8 +309,6 @@ void InitNMB(List *NMB,NPC &NM){
 	TMP->x=NM.x;
 	TMP->y=NM.y;
 	TMP->deg=1;		//For future development
-
-	NMB->next=NULL;
 }
 
 void DrawNMB(List *NMB){
