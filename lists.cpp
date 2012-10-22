@@ -24,6 +24,7 @@ List *ListDel(List *LST,List *last){
 List *ListAdd(List *LST){
 	if (LST==NULL){
 		LST=(List*)malloc(sizeof(List));
+		LST->next=NULL;
 	}
 	else{
 		List *TMP=LST;
@@ -31,6 +32,7 @@ List *ListAdd(List *LST){
 			TMP=TMP->next;
 		}
 		TMP->next=(List*)malloc(sizeof(List));
+		TMP->next->next=NULL;
 	}
 	return LST;
 }
