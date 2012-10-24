@@ -181,8 +181,8 @@ List* ColideTS(PC &TS, List *NMB){
 	while(NMB!=NULL){
 		TMP=(NPCB*)NMB->element;
 
-				al_draw_rectangle(TMP->x-TMP->bound, TMP->y-TMP->bound, TMP->x+TMP->bound, TMP->y+TMP->bound, al_map_rgb(255,0,0), 1);
-				al_draw_rectangle(TS.x-TS.boundx, TS.y-TS.boundy, TS.x+TS.boundx, TS.y+TS.boundy, al_map_rgb(0,255,0), 1);
+				//al_draw_rectangle(TMP->x-TMP->bound, TMP->y-TMP->bound, TMP->x+TMP->bound, TMP->y+TMP->bound, al_map_rgb(255,0,0), 1);
+				//al_draw_rectangle(TS.x-TS.boundx, TS.y-TS.boundy, TS.x+TS.boundx, TS.y+TS.boundy, al_map_rgb(0,255,0), 1);
 
 		if((( TMP->y-TMP->bound)<(TS.y+TS.boundy)) && 
 			((TMP->y+TMP->bound)>(TS.y-TS.boundy)) &&
@@ -210,8 +210,8 @@ List* ColideNM(NPC &NM, List *TSB,PC &TS){
 	while(TSB!=NULL){
 		TMP=(PCB*)TSB->element;
 
-				al_draw_rectangle(TMP->x-TMP->bound, TMP->y-TMP->bound, TMP->x+TMP->bound, TMP->y+TMP->bound, al_map_rgb(255,0,0), 1);
-				al_draw_rectangle(NM.x-NM.boundx, NM.y-NM.boundy, NM.x+NM.boundx, NM.y+NM.boundy, al_map_rgb(0,255,0), 1);
+				//al_draw_rectangle(TMP->x-TMP->bound, TMP->y-TMP->bound, TMP->x+TMP->bound, TMP->y+TMP->bound, al_map_rgb(255,0,0), 1);
+				//al_draw_rectangle(NM.x-NM.boundx, NM.y-NM.boundy, NM.x+NM.boundx, NM.y+NM.boundy, al_map_rgb(0,255,0), 1);
 
 		if((( TMP->y-TMP->bound)<(NM.y+NM.boundy)) && 
 			((TMP->y+TMP->bound)>(NM.y-NM.boundy)) &&
